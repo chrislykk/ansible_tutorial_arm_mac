@@ -6,9 +6,9 @@
 
   - name: install updates (Fedora)
     tags: always
-    ansible.builtin.dnf:
-      update_only: yes
+    package:
       update_cache: yes
+      state: latest
     when: ansible_distribution == "Fedora"
 
   - name: install updates (Ubuntu)
@@ -19,22 +19,22 @@
     when: ansible_distribution == "Ubuntu"
 
 - hosts: workstations
-  become: true
+  become: false
   tasks:
 
   - name: install unzip
     package:
       name: unzip
 
-  - name: install terraform
-    unarchive:
-      src: https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_amd64.zip
-      dest: /usr/local/bin
-      remote_src: yes
-      mode: 0755
-      owner: root
-      group: root
+  - name: Ensure Homebrew is installed
+    command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    args:
+      creates: /opt/homebrew/bin/brew
 
+  - name: Install Terraform via Homebrew
+    homebrew:
+      name: terraform
+      state: present
 
 - hosts: web_servers
   become: true
@@ -51,7 +51,7 @@
   
   - name: install apache and php for Fedora servers
     tags: apache,httpd,Fedora
-    ansible.builtin.dnf:
+    package:
       name:
         - httpd
         - php
@@ -90,6 +90,13 @@
       owner: root
       group: root
       mode: 0644
+  
+  - name: Disable and stop firewalld (Fedora)
+    service:
+      name: firewalld
+      state: stopped
+      enabled: no
+    when: ansible_distribution == "Fedora"
 
 - hosts: db_servers
   become: true
@@ -97,7 +104,7 @@
   
   - name: install mariadb package (Fedora)
     tags: Fedora,db,mariadb
-    ansible.builtin.dnf:
+    package:
       name: mariadb
       state: latest
     when: ansible_distribution == "Fedora"
