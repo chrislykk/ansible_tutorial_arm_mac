@@ -6,7 +6,7 @@
 
   - name: install updates (Fedora)
     tags: always
-    dnf:
+    ansible.builtin.dnf:
       update_only: yes
       update_cache: yes
     when: ansible_distribution == "Fedora"
@@ -51,7 +51,7 @@
   
   - name: install apache and php for Fedora servers
     tags: apache,httpd,Fedora
-    dnf:
+    ansible.builtin.dnf:
       name:
         - httpd
         - php
@@ -97,7 +97,7 @@
   
   - name: install mariadb package (Fedora)
     tags: Fedora,db,mariadb
-    dnf:
+    ansible.builtin.dnf:
       name: mariadb
       state: latest
     when: ansible_distribution == "Fedora"
