@@ -1,0 +1,8 @@
+[web_servers]
+Ubuntu1
+
+[db_servers]
+Ubuntu2
+
+[file_servers]
+Ubuntu3
